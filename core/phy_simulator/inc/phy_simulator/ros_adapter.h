@@ -53,6 +53,7 @@ class RosAdapter {
    * @param stamp ROS time stamp
    */
   void PublishDynamicDataWithStamp(const ros::Time &stamp);
+  void HC_PublishDynamicDataWithStamp(const common::VehicleSet& vehicle_set, const ros::Time& stamp);
 
   /**
    * @brief Publish static data of simulator with time stamp

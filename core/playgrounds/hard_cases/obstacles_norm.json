@@ -1,0 +1,11 @@
+{
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "hard_cases"
+    }
+  },
+  "type": "FeatureCollection",
+  "name": "obstacles",
+  "features": []
+}

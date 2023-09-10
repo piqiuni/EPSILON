@@ -45,4 +45,12 @@ void RosAdapter::PublishDynamicDataWithStamp(const ros::Time& stamp) {
 }
 
 
+void RosAdapter::HC_PublishDynamicDataWithStamp(const common::VehicleSet& vehicle_set, const ros::Time& stamp) {
+  vehicle_msgs::ArenaInfoDynamic msg;
+  vehicle_msgs::Encoder::GetRosArenaInfoDynamicFromSimulatorData(
+      vehicle_set, stamp, std::string("map"), &msg);
+  arena_info_dynamic_pub_.publish(msg);
+}
+
+
 }  // namespace phy_simulator

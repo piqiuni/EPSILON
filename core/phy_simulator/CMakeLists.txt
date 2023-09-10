@@ -52,6 +52,27 @@ target_link_libraries(phy_simulator_planning_node
     ${catkin_LIBRARIES}
     phy_simulator_lib
 )
+
+# add_library(phy_simulator_lib
+#     src/phy_simulator/arena_loader.cc
+#     src/phy_simulator/phy_simulator.cc
+# )
+# target_link_libraries(phy_simulator_lib
+#     hkust_pl_vehicle_model
+#     hkust_pl_common
+# )
+
+add_executable(hard_case_phy_simulator_planning_node
+    src/hard_case_phy_simulator_planning_node.cc
+    src/phy_simulator/visualizer.cc
+    src/phy_simulator/ros_adapter.cc
+)
+target_link_libraries(hard_case_phy_simulator_planning_node
+    ${catkin_LIBRARIES}
+    phy_simulator_lib
+)
+
+
 #install the hearder files so that other packages can include.
 #install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
