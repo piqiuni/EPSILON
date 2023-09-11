@@ -1,1 +1,35 @@
-
+{
+  "vehicles": {
+    "COMMENT_": "[Vehicles info] - END",
+    "_COMMENT": "[Vehicles info] - START",
+    "__COMMENT": "Vehicle Subclass: car, van, truck.",
+    "___COMMENT": "Vehicle Type: VehicleWithBicycleKinematics, VehicleDoubleIntegratorKinematics, VehicleSingleIntegratorKinematics",
+    "info": [
+      {
+        "id": 0,
+        "init_state": {
+          "acceleration": 0.0,
+          "angle": -0.024150500892024584,
+          "curvature": 0.0,
+          "steer": 0.0,
+          "velocity": 0.8151747984202445,
+          "x": 3414.0188704966404,
+          "y": -1419.4891755994918
+        },
+        "params": {
+          "front_suspension": 0.93,
+          "length": 4.5,
+          "max_lateral_acc": 2.0,
+          "max_longitudinal_acc": 2.0,
+          "max_steering_angle": 45.0,
+          "rear_suspension": 1.1,
+          "wheel_base": 2.85,
+          "width": 1.9
+        },
+        "subclass": "car",
+        "type": "VehicleWithBicycleKinematics"
+      }
+    ],
+    "num": 1
+  }
+}

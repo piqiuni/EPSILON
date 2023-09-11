@@ -66,7 +66,10 @@ ErrorType SplineGenerator<N_DEG, N_DIM>::GetCubicSplineBySampleInterpolation(
     }
 
     tk::spline cubic_fitting;
+    // std::cout << "cubic: " << std::endl;
+    // for(double s : X) std::cout << s << " ";
     cubic_fitting.set_points(X, Y);
+    
 
     for (int n = 0; n < cubic_fitting.num_pts() - 1; n++) {
       Vecf<N_DEG + 1> coeff = Vecf<N_DEG + 1>::Zero();

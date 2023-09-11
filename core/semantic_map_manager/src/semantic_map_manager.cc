@@ -44,10 +44,15 @@ ErrorType SemanticMapManager::UpdateSemanticMap(
 
   // * update lanes and topologies
   UpdateSemanticLaneSet();
+  std::cout << std::endl;
+  std::cout << surrounding_lane_net_.lane_set.size() << " lanes in total."
+            << std::endl;
 
   // * update key lanes and its LUT
   if (agent_config_info_.enable_fast_lane_lut) {
+    printf("in\r\n");
     UpdateLocalLanesAndFastLut();
+    printf("out\r\n");
   }
 
   // * update semantic info for vehicles
@@ -338,6 +343,8 @@ ErrorType SemanticMapManager::UpdateSemanticLaneSet() {
       for (const auto &pt : pe.second.lane_points) {
         samples.push_back(pt);
       }
+      // std::cout << semantic_lane.id << std::endl;
+      // printf("samples size: %d, %d\r\n", pe.second.lane_points.size(), samples.size());
       if (common::LaneGenerator::GetLaneBySamplePoints(
               samples, &semantic_lane.lane) != kSuccess) {
         continue;
@@ -584,6 +591,7 @@ ErrorType SemanticMapManager::GetDistanceToLanesUsing3DofState(
     const Vec3f &state,
     std::set<std::tuple<decimal_t, decimal_t, decimal_t, int>> *res) const {
   for (const auto &p : semantic_lane_set_.semantic_lanes) {
+    // std::cout << "[XXX]lane_id: " << p.second.id << std::endl;
     decimal_t arc_len;
     p.second.lane.GetArcLengthByVecPosition(Vec2f(state(0), state(1)),
                                             &arc_len);
@@ -765,6 +773,8 @@ ErrorType SemanticMapManager::GetNearestLaneIdUsingState(
     return kWrongStatus;
   }
 
+
+  // std::cout << "[XXX]lane_num: " << semantic_lane_set_.semantic_lanes.size() << std::endl;
   if (lanes_in_dist.empty()) {
     printf("[GetNearestLaneIdUsingState]No nearest lane found.\n");
     return kWrongStatus;

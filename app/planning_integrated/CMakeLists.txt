@@ -20,6 +20,7 @@ find_package(semantic_map_manager REQUIRED)
 find_package(behavior_planner REQUIRED)
 find_package(eudm_planner REQUIRED)
 find_package(ssc_planner REQUIRED)
+find_package(dataset REQUIRED)
 #if this catkin packge's header is used by other packages, use catkin_package to
 #declare the include directories of this package.
 catkin_package(
@@ -34,6 +35,7 @@ include_directories(
     ${behavior_planner_INCLUDE_DIRS}
     ${eudm_planner_INCLUDE_DIRS}
     ${ssc_planner_INCLUDE_DIRS}
+    ${dataset_INCLUDE_DIRS}
 )
 
 add_executable(test_ssc_with_mpdm

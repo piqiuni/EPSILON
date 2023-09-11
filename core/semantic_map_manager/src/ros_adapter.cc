@@ -17,18 +17,18 @@ void RosAdapter::Init() {
   }
 }
 
-// ! DEPRECATED (@lu.zhang)
-void RosAdapter::ArenaInfoCallback(
-    const vehicle_msgs::ArenaInfo::ConstPtr& msg) {
-  ros::Time time_stamp;
-  vehicle_msgs::Decoder::GetSimulatorDataFromRosArenaInfo(
-      *msg, &time_stamp, &lane_net_, &vehicle_set_, &obstacle_set_);
-  p_data_renderer_->Render(time_stamp.toSec(), lane_net_, vehicle_set_,
-                           obstacle_set_);
-  if (has_callback_binded_) {
-    private_callback_fn_(*p_smm_);
-  }
-}
+// // ! DEPRECATED (@lu.zhang)
+// void RosAdapter::ArenaInfoCallback(
+//     const vehicle_msgs::ArenaInfo::ConstPtr& msg) {
+//   ros::Time time_stamp;
+//   vehicle_msgs::Decoder::GetSimulatorDataFromRosArenaInfo(
+//       *msg, &time_stamp, &lane_net_, &vehicle_set_, &obstacle_set_);
+//   p_data_renderer_->Render(time_stamp.toSec(), lane_net_, vehicle_set_,
+//                            obstacle_set_);
+//   if (has_callback_binded_) {
+//     private_callback_fn_(*p_smm_);
+//   }
+// }
 
 void RosAdapter::ArenaInfoStaticCallback(
     const vehicle_msgs::ArenaInfoStatic::ConstPtr& msg) {

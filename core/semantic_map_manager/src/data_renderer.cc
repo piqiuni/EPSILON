@@ -46,7 +46,6 @@ ErrorType DataRenderer::Render(const double &time_stamp,
   TicToc timer;
   FakeMapper();
   // printf("[RayCasting]Time cost: %lf ms\n", timer.toc());
-
   p_semantic_map_manager_->UpdateSemanticMap(
       time_stamp_, ego_vehicle_, whole_lane_net_, surrounding_lane_net_,
       *p_obstacle_grid_, obs_grids_, surrounding_vehicles_);

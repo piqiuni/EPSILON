@@ -12,12 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
     visualization_msgs
     sensor_msgs
     geometry_msgs
+    dataset
 )
 
 find_package(Eigen3 REQUIRED)
 find_package(common REQUIRED)
 find_package(vehicle_model REQUIRED)
 find_package(vehicle_msgs REQUIRED)
+# find_package(dataset REQUIRED)
 
 #if this catkin packge's header is used by other packages, use catkin_package to
 #declare the include directories of this package.
@@ -32,7 +34,9 @@ include_directories(
     ${semantics_msgs_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    # ${dataset_INCLUDE_DIRS}
 )
+# message("=======================================catkin include dir: "${catkin_INCLUDE_DIRS})
 
 add_library(phy_simulator_lib
     src/phy_simulator/arena_loader.cc

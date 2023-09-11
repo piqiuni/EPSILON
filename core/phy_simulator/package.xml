@@ -52,6 +52,9 @@
   <run_depend>common</run_depend>
   <run_depend>vehicle_model</run_depend>
 
+  <build_depend>dataset</build_depend>
+  <run_depend>dataset</run_depend>
+
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

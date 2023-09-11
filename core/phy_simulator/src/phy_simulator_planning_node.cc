@@ -22,10 +22,10 @@
 using namespace phy_simulator;
 
 DECLARE_BACKWARD;
-const double simulation_rate = 500.0;
-const double gt_msg_rate = 100.0;
+const double simulation_rate = 10.0;
+const double gt_msg_rate = 10.0;
 const double gt_static_msg_rate = 10.0;
-const double visualization_msg_rate = 20.0;
+const double visualization_msg_rate = 10.0;
 
 common::VehicleControlSignalSet _signal_set;
 std::vector<ros::Subscriber> _ros_sub;
