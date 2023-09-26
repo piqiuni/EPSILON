@@ -18,16 +18,15 @@
     <!-- ↑ old_12 left turn unable to pass-->
     <!-- <param name="case_path" type="string" value="/home/rancho/2lidelun/Huawei-dataset/DATA/case_0706/segment15##goal_pre#source_202305#generate#dataVector.json-1686556633" /> -->
     <!-- ↑ 0706_? cutin unable to pass -->
-    <param name="case_path" type="string" value="/home/rancho/2lidelun/Huawei-dataset/DATA/case_old/4812-2022-07-08-172800" />
+    <!-- <param name="case_path" type="string" value="/home/rancho/2lidelun/Huawei-dataset/DATA/case_0706/segment10##goal_pre#source_202305#generate#dataVector.json-1686641378" /> -->
     <!-- ↑ 0706_? cutin unable to pass -->
     <!-- <param name="case_path" type="string" value="/home/rancho/2lidelun/Huawei-dataset/DATA/case_0706/segment18##goal_pre#source_202305#generate#dataVector.json-core_time" /> -->
     <!-- ↑ 0706_? dense, solver error, unable to pass -->
 
-    <param name="folder_name" type="string" value="test" />
-    <param name="case_id" type="int" value="0" />
-    <param name="start_frame" type="int" value="0" />
-    <param name="init_angle" type="double" value="-100.0" />
-    <param name="use_ego_path" type="bool" value="false" />
+    <!-- <param name="foler_name" type="string" value="test" /> -->
+    <!-- <param name="case_id" type="int" value="0" /> -->
+    <!-- <param name="start_frame" type="int" value="0" /> -->
+    <!-- <param name="init_angle" type="double" value="-100.0" /> -->
     
     <remap from="~arena_info_static" to="$(arg arena_info_static_topic)"/>
     <remap from="~arena_info_dynamic" to="$(arg arena_info_dynamic_topic)"/>

@@ -21,9 +21,59 @@
 #include "phy_simulator/visualizer.h"
 
 #include "dataset/get_raw_data.h"
+#include "dataset/save_data.h"
+#include <unistd.h>
 // #include "dataset
 
+#include <cstdlib>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <json/json.hpp>
+
+#include <iostream>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+
 using namespace phy_simulator;
+using Json = nlohmann::json;
+
+pid_t roslaunchProcessId = 0;
+
+// 启动roslaunch进程
+void startRoslaunch()
+{
+    roslaunchProcessId = fork();
+    if (roslaunchProcessId == 0) {
+        // 子进程中，执行roslaunch命令
+        execlp("roslaunch", "roslaunch", "planning_integrated", "test_ssc_with_eudm_ros.launch", NULL);
+        exit(0);
+    }
+}
+
+
+// 终止roslaunch进程
+void stopRoslaunch()
+{
+    if (roslaunchProcessId != 0) {
+        kill(roslaunchProcessId, SIGTERM);
+        int status;
+        waitpid(roslaunchProcessId, &status, 0);
+        roslaunchProcessId = 0;
+    }
+}
+
+
+bool createDirectory(const std::string& folderName) {
+    int result = mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    return (result == 0);
+}
+
+bool folderExists(const std::string& folderName) {
+    struct stat buffer;
+    return (stat(folderName.c_str(), &buffer) == 0 && S_ISDIR(buffer.st_mode));
+}
 
 DECLARE_BACKWARD;
 const double simulation_rate = 10.0;
@@ -64,18 +114,38 @@ void NavGoalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 int main(int argc, char** argv) {
   ros::init(argc, argv, "~");
   ros::NodeHandle nh("~");
+  Json data_to_save;
 
+  std::string LOG_PATH = "/home/rancho/2lidelun/Huawei-dataset/LOG";
+  if (!folderExists(LOG_PATH)) {
+    createDirectory(LOG_PATH);
+  }
   // 1.read the case.json files
   std::string case_path;
   if (!nh.getParam("case_path", case_path)) {
     ROS_ERROR("Failed to get param case_path");
     assert(false);
   }
+  std::string scene_name = case_path.substr(case_path.find_last_of('/') + 1);
+  std::string folder_name;
+  if (!nh.getParam("folder_name", folder_name)) {
+    ROS_ERROR("Failed to get param folder_name");
+    assert(false);
+  }
+  std::string save_folder = LOG_PATH + "/" + folder_name;
+  if (!folderExists(save_folder)) {
+    createDirectory(save_folder);
+  }
+  
   int case_id;
   if (!nh.getParam("case_id", case_id)) {
     ROS_ERROR("Failed to get param case_id");
     assert(false);
   }
+
+  std::string save_path = LOG_PATH + "/" + folder_name + "/" + std::to_string(case_id) + "_" + scene_name + ".json";
+  ROS_WARN("save_path:%s", save_path.c_str());
+
   int start_frame;
   int frame_now, max_frame;
   if (!nh.getParam("start_frame", start_frame)) {
@@ -89,11 +159,19 @@ int main(int argc, char** argv) {
     ROS_ERROR("Failed to get param init_angle");
     assert(false);
   }
-  
+  startRoslaunch();
   std::vector<Json> frames;
   get_raw_data(case_path, frames);
+  std::unordered_map<std::string, std::vector<Eigen::Vector2d>> lanes;
+  get_lanes(frames, lanes);
   max_frame = frames.size();
+  // max_frame = 3;
 
+  bool use_ego_path = true;
+  if (!nh.getParam("use_ego_path", use_ego_path)) {
+    ROS_ERROR("Failed to get param use_ego_path");
+    assert(false);
+  }
 
 
   // 2.deal with the .json files
@@ -108,12 +186,38 @@ int main(int argc, char** argv) {
   //  get lane_net.json 
   std::vector<Eigen::Vector2d> ego_path;
   std::string save_path_lane_net =    "/home/rancho/2lidelun/EPSILON_ws/src/EPSILON/core/playgrounds/hard_cases/lane_net_norm.json";
-  ErrorType result1 = get_ego_path(frames, ego_path);
+  ErrorType result1;
+  if (use_ego_path)
+  {
+    result1 = get_ego_path(frames, ego_path);
+  }
+  else
+  {
+    result1 = get_ego_lane(frames[start_frame], lanes, ego_path);
+  }
+
+
   if (result1 != kSuccess) {
     std::cout << "Failed to save_path_lane_net." << std::endl;
     assert(false);
   }
-  ErrorType result2 = save_ego_path(ego_path, save_path_lane_net);
+  // ErrorType result2 = save_ego_path(ego_path, save_path_lane_net);
+  std::vector<std::vector<Eigen::Vector2d>> save_lane_net;
+  save_lane_net.emplace_back(ego_path);
+
+  // 
+  std::vector<Eigen::Vector2d> obj_path;
+  int id = 1280;
+  get_obj_path(frames, obj_path, id);
+  if (obj_path.size()>0)
+  {
+    save_lane_net.emplace_back(obj_path);
+  }
+
+
+  ErrorType result2 = save_lanes(save_lane_net, save_path_lane_net);
+
+
   if (result2 != kSuccess) {
     std::cout << "Failed to save_ego_path." << std::endl;
     assert(false);
@@ -193,6 +297,12 @@ int main(int argc, char** argv) {
 
   while (ros::ok()) {
     ros::spinOnce();
+    if (frame_now == max_frame) {
+      std::cout << "frame_now == max_frame" << std::endl;
+      stopRoslaunch();
+      save_data(save_path, data_to_save, scene_name);
+      break;
+    }
 
     phy_sim.UpdateSimulatorUsingSignalSet(_signal_set, 1.0 / simulation_rate);
     vehicle_set = phy_sim.vehicle_set();
@@ -204,7 +314,7 @@ int main(int argc, char** argv) {
     std::vector<common::Vehicle> key_objects;
     auto time0 = ros::Time::now();
     get_key_objects(frame_data_now, ego_vehicle, key_objects);
-    std::cout << "get_key_objects time:" << ros::Time::now() - time0 << std::endl;
+    std::cout << "get_key_objects time:" << 1000*(ros::Time::now() - time0).toSec() << "ms" << std::endl;
     int sim_id = 1;
     // get key objects' states
     for(common::Vehicle obj: key_objects)
@@ -228,15 +338,15 @@ int main(int argc, char** argv) {
 
       // common::Vehicle vehicle_new(sim_id, "car", param, state);
 
-      obj.set_id(sim_id);
-      vehicles.emplace(sim_id, obj);
+      // obj.set_id(sim_id);
+      
+      vehicles.emplace(obj.id(), obj);
       sim_id += 1;
     }
     std::cout << "+++++++++++sim_id:" << sim_id << std::endl;
     std::cout << "+++++++++++frame_now:" << frame_now << ", max_frame" << max_frame << std::endl;
 
     vehicle_set.vehicles = vehicles;
-    frame_now += 1;
 
     // UpdateVehicleInfo(vehicle_set, );
     ros::Time tnow = ros::Time::now();
@@ -257,7 +367,11 @@ int main(int argc, char** argv) {
       next_vis_pub_time += ros::Duration(1.0 / visualization_msg_rate);
       visualizer.VisualizeDataWithStamp(tnow);
     }
+    Json data_frame;
+    save_data_frame(vehicles, frame_now, data_frame);
+    data_to_save["frames"].push_back(data_frame);
 
+    frame_now += 1;
     rate.sleep();
   }
 
